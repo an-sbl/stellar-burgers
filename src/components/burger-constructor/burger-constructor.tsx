@@ -1,24 +1,49 @@
 import { FC, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
+import { useSelector, useDispatch } from '../../services/store';
+import {
+  selectConstructorItems,
+  updateConstructorItems
+} from '../../slices/burgerConstruclorSlice';
+import {
+  selectOrderModalData,
+  selectOrderRequest,
+  fetchOrder,
+  updateOrderRequest
+} from '../../slices/orderSlice';
+import { selectIsAuthenticated } from '../../slices/userSlice';
 
 export const BurgerConstructor: FC = () => {
+  const constructorItems = useSelector(selectConstructorItems);
   /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
-  const constructorItems = {
-    bun: {
-      price: 0
-    },
-    ingredients: []
-  };
-
-  const orderRequest = false;
-
-  const orderModalData = null;
+  const orderRequest = useSelector(selectOrderRequest);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const orderModalData = useSelector(selectOrderModalData);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const onOrderClick = () => {
-    if (!constructorItems.bun || orderRequest) return;
+    const ingredientsIds = constructorItems.ingredients.map((item) => item._id);
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else {
+      if (constructorItems.bun && constructorItems.ingredients.length) {
+        dispatch(
+          fetchOrder([
+            constructorItems.bun._id,
+            ...ingredientsIds,
+            constructorItems.bun._id
+          ])
+        );
+      }
+    }
   };
-  const closeOrderModal = () => {};
+  const closeOrderModal = () => {
+    dispatch(updateConstructorItems());
+    dispatch(updateOrderRequest());
+  };
 
   const price = useMemo(
     () =>
@@ -29,9 +54,6 @@ export const BurgerConstructor: FC = () => {
       ),
     [constructorItems]
   );
-
-  return null;
-
   return (
     <BurgerConstructorUI
       price={price}
