@@ -13,7 +13,6 @@ import '../../index.css';
 import styles from './app.module.css';
 import { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { getCookie } from '../../utils/cookie';
 import {
   AppHeader,
   Modal,
@@ -32,12 +31,15 @@ import {
 } from '../../slices/ingredientsSlice';
 import {
   selectIsModalOpened as selectModalOrder,
-  closeModal as closeModalOrder
+  closeModal as closeModalOrder,
+  selectFeed,
+  fetchFeed
 } from '../../slices/feedSlice';
 import { checkUserAuth } from '../../slices/userSlice';
 const App = () => {
   const dispatch = useDispatch();
   const ingredients = useSelector(selectIngredients);
+  const ordersFeed = useSelector(selectFeed);
   const isLoading = useSelector(selectLoading);
   const isModalOpenedIngridient = useSelector(selectModalIngridient);
   const isModalOpenedOrder = useSelector(selectModalOrder);
@@ -47,6 +49,9 @@ const App = () => {
   useEffect(() => {
     if (!ingredients.length) {
       dispatch(fetchIngredients());
+    }
+    if (!ordersFeed.length) {
+      dispatch(fetchFeed());
     }
   }, []);
 
@@ -121,7 +126,7 @@ const App = () => {
                   path='/feed/:number'
                   element={
                     <Modal
-                      title={'Описание заказа'}
+                      title={''}
                       onClose={() => {
                         dispatch(closeModalOrder());
                       }}
@@ -134,7 +139,7 @@ const App = () => {
                   path='/profile/orders/:number'
                   element={
                     <Modal
-                      title={'Описание вашего заказа'}
+                      title={``}
                       onClose={() => {
                         dispatch(closeModalOrder());
                       }}

@@ -47,4 +47,6 @@ export type TFeed = {
   orders: TOrder[];
   total: number;
   totalToday: number;
+  isLoading?: boolean;
+  error?: string | null;
 };

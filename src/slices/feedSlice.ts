@@ -43,6 +43,9 @@ const feedSlice = createSlice({
     builder.addCase(fetchFeed.pending, (state) => {
       state.loading = true;
     });
+    builder.addCase(fetchFeed.rejected, (state) => {
+      state.loading = false;
+    });
     builder.addCase(fetchFeed.fulfilled, (state, action) => {
       state.loading = false;
       state.feed = action.payload.orders;

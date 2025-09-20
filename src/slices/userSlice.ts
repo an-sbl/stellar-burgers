@@ -39,14 +39,32 @@ const initialState: TInitState = {
   isAuthChecked: false
 };
 
+const saveTokens = (accessToken: string, refreshToken: string) => {
+  setCookie('accessToken', accessToken);
+  localStorage.setItem('refreshToken', refreshToken);
+};
+
+const clearTokens = () => {
+  deleteCookie('accessToken');
+  localStorage.removeItem('refreshToken');
+};
+
 export const fetchRegisterUser = createAsyncThunk(
   'user/register',
-  async (data: TRegisterData) => registerUserApi(data)
+  async (data: TRegisterData) => {
+    const response = await registerUserApi(data);
+    saveTokens(response.accessToken, response.refreshToken);
+    return response;
+  }
 );
 
 export const fetchLoginUser = createAsyncThunk(
   'user/login',
-  async (data: TLoginData) => loginUserApi(data)
+  async (data: TLoginData) => {
+    const response = await loginUserApi(data);
+    saveTokens(response.accessToken, response.refreshToken);
+    return response;
+  }
 );
 
 export const fetchUpdateUser = createAsyncThunk(
@@ -54,9 +72,11 @@ export const fetchUpdateUser = createAsyncThunk(
   async (data: Partial<TRegisterData>) => updateUserApi(data)
 );
 
-export const fetchLogoutUser = createAsyncThunk('user/logout', async () =>
-  logoutApi()
-);
+export const fetchLogoutUser = createAsyncThunk('user/logout', async () => {
+  await logoutApi();
+  clearTokens();
+  return null;
+});
 
 export const fetchUserOrders = createAsyncThunk('user/orders', async () =>
   getOrdersApi()
@@ -108,8 +128,6 @@ const userSlice = createSlice({
       })
       .addCase(fetchRegisterUser.fulfilled, (state, action) => {
         state.loading = false;
-        localStorage.setItem('refreshToken', action.payload.refreshToken);
-        setCookie('accessToken', action.payload.accessToken);
         state.user = action.payload.user;
         state.isAuthenticated = true;
         state.errorMessage = '';
@@ -124,8 +142,6 @@ const userSlice = createSlice({
       })
       .addCase(fetchLoginUser.fulfilled, (state, action) => {
         state.loading = false;
-        setCookie('accessToken', action.payload.accessToken);
-        localStorage.setItem('refreshToken', action.payload.refreshToken);
         state.user = action.payload.user;
         state.isAuthenticated = true;
         state.isAuthChecked = true;
@@ -153,8 +169,6 @@ const userSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = false;
         state.user = { name: '', email: '' };
-        deleteCookie('accessToken');
-        localStorage.removeItem('refreshToken');
       })
       .addCase(fetchUserOrders.pending, (state) => {
         state.loading = true;
