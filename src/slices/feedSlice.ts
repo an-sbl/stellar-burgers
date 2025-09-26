@@ -10,7 +10,7 @@ interface TInitState {
   isModalOpened: boolean;
 }
 
-const initialState: TInitState = {
+export const initialState: TInitState = {
   feed: [],
   loading: false,
   total: 0,

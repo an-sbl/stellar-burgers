@@ -9,7 +9,7 @@ interface TInitState {
   constructorItems: TConstructorItems;
 }
 
-const initialState: TInitState = {
+export const initialState: TInitState = {
   constructorItems: {
     bun: null,
     ingredients: []
