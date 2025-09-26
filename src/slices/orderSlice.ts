@@ -7,7 +7,7 @@ interface TInitState {
   orderRequest: boolean;
 }
 
-const initialState: TInitState = {
+export const initialState: TInitState = {
   orderModalData: null,
   orderRequest: false
 };

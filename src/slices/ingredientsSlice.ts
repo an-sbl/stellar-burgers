@@ -9,7 +9,7 @@ interface TInitState {
   errorText: string;
 }
 
-const initialState: TInitState = {
+export const initialState: TInitState = {
   ingredients: [],
   loading: false,
   isModalOpened: false,

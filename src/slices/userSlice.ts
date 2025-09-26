@@ -29,7 +29,7 @@ interface TInitState {
   isAuthChecked: boolean;
 }
 
-const initialState: TInitState = {
+export const initialState: TInitState = {
   user: null,
   userOrders: [],
   isModalOpen: false,
